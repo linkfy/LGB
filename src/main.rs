@@ -20,14 +20,15 @@ const BACKGROUND: u32 = 0x8AAB19;
 // END WINDOW
 
 // SYSTEM PARAMETERS
+mod opcodes;
 mod instructions;
+mod registers;
 mod cpu;
 mod rom;
-mod ram;
+mod mmu;
 
 use cpu::Cpu;
 use rom::Rom;
-use ram:: Ram;
 
 const CLOCK_SPEED: i32 = 4194304;
 const FRAME_RATE: i32 = 60;
@@ -41,13 +42,12 @@ const FRAME_RATE: i32 = 60;
 |_| |_| |_|\__,_|_|_| |_|
  */
 fn main() {
-    
-    //Create a new CPU
-    let mut cpu = Cpu::new();
-    //Create a RAM
-    let mut ram = Ram::new();
     //Load a ROM
     let mut rom = Rom::load("ROMS/dmg_boot.bin".to_string());
+
+    //Create a new CPU
+    let mut cpu = Cpu::new();
+    
     //Create the window parameters
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     let mut window = Window::new("Linkfy GB Emulator", WIDTH, HEIGHT, WindowOptions {
