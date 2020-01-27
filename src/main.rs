@@ -71,11 +71,13 @@ __      _(_)_ __   __| | _____      _| | ___   ___  _ __
   \_/\_/ |_|_| |_|\__,_|\___/ \_/\_/ |_|\___/ \___/| .__/
                                                    |_|
     */
-
+    
     while window.is_open() && !window.is_key_down(Key::Escape) {
+        //Example to Window image on screen
         
         //We need to calculate the cycles to execute each frame from 0 to cycles_per_frame
         let mut cycles = 0;
+        
         let cycles_per_frame = CLOCK_SPEED / FRAME_RATE;
         
         // Get the actual time and the time that a single frame needs
@@ -91,18 +93,18 @@ __      _(_)_ __   __| | _____      _| | ___   ___  _ __
             
             cycles += cpu.execute_instruction(&mut mem);
             cpu.registers.print();
-                
         }
-
+        
         let elapsed_time = start_time.elapsed();
         if elapsed_time < frame_time {
             println!("Update");
             //Update the screen each Frame
+            //Update screen for testing
+            setBackground(&mut buffer, &mut window);
             let remaining_time = frame_time - elapsed_time;
             thread::sleep(remaining_time);
         }
-        //Example to Window image on screen
-        setBackground(&mut buffer, &mut window);
+        
         
     }
 }
