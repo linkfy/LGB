@@ -25,10 +25,11 @@ mod instructions;
 mod registers;
 mod cpu;
 mod rom;
-mod mmu;
+mod memory_bus;
 
 use cpu::Cpu;
 use rom::Rom;
+use memory_bus::Memory;
 
 const CLOCK_SPEED: i32 = 4194304;
 const FRAME_RATE: i32 = 60;
@@ -42,12 +43,12 @@ const FRAME_RATE: i32 = 60;
 |_| |_| |_|\__,_|_|_| |_|
  */
 fn main() {
-    //Load a ROM
-    let mut rom = Rom::load("ROMS/dmg_boot.bin".to_string());
 
-    //Create a new CPU
     let mut cpu = Cpu::new();
+    let mut mem = Memory::new();
+
     
+
     //Create the window parameters
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     let mut window = Window::new("Linkfy GB Emulator", WIDTH, HEIGHT, WindowOptions {
@@ -88,7 +89,7 @@ __      _(_)_ __   __| | _____      _| | ___   ___  _ __
             println!("Cycle {}/{}", cycles, cycles_per_frame);
 
             
-            cycles += cpu.execute_instruction(&mut rom);
+            cycles += cpu.execute_instruction(&mut mem);
             cpu.registers.print();
                 
         }
@@ -104,22 +105,6 @@ __      _(_)_ __   __| | _____      _| | ___   ___  _ __
         setBackground(&mut buffer, &mut window);
         
     }
-
-/*
- _           _
-| |_ ___ ___| |_ ___
-| __/ _ / __| __/ __|
-| ||  __\__ | |_\__ \
- \__\___|___/\__|___/ parameters
-*/
-    cpu.registers.print();
-    cpu.registers.set("a", 0xFF);
-    cpu.registers.print();
-    cpu.registers.set("ab", 0xF00F);
-    cpu.registers.print();
-    cpu.registers.print();
-    
-    
 }
 
 /*
