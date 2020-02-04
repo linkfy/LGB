@@ -15,7 +15,11 @@ impl Cpu {
             opcodes_table: instructions::new(),
         }
     }
+    
+    /// Return the number of cycles passed
     pub fn execute_instruction(&mut self,  mem: &mut Memory) -> i32 {
+        let byte = mem.read_byte(self);
+        println!("{:X}", byte);
         /*let byte = rom.read_byte(self);
         let byte_as_string = format!("0x{:0>2x}",byte);*/
         /* let instruction_json = &self.opcodes_table["unprefixed"][byte_as_string];

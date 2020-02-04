@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::Read;
 
-#[derive(Debug)]
-enum Mbc {
+#[derive(Debug, PartialEq)]
+pub enum Mbc {
     RomOnly,
     Mbc1,
     Mbc2,
@@ -11,10 +11,10 @@ enum Mbc {
     Mbc5,
     Unknown
 }
-
+#[derive(Debug)]
 pub struct Rom {
-    buffer: Vec<u8>,
-    mbc: Mbc,
+    pub buffer: Vec<u8>,
+    pub mbc: Mbc,
 }
 
 impl Rom {
