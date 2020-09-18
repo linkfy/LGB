@@ -78,7 +78,9 @@ impl Cpu {
         let byte_as_string = format!("0x{:0>2x}",byte);
         let instruction_json = &self.opcodes_table["unprefixed"][byte_as_string];
         let instruction = self.parse_instruction(instruction_json);
+        let instruction_cycles = i32::clone(&instruction.cycles[0]);
         println!("{:?}", instruction);
+        println!("{:?}",instruction_cycles);
         
 
         //println!("Opcode for Byte: 0x{:0>2X} is {}", byte, instruction_json);
@@ -89,8 +91,8 @@ impl Cpu {
             "PREFIX" => self.execute_prefix_instruction(mem),
             _=> self.instruction_unimplemented(&instruction_json),
         };
-        //TODO return cycles used
-        0
+        //Return cycles used
+        instruction_cycles
     }
 
     fn execute_prefix_instruction(&mut self, mem: &mut Memory) -> i32{
@@ -117,12 +119,13 @@ impl Cpu {
         //Little endian: last byte goes first in memory
         let byteJoin: u16 = (byte2 as u16) << 8 | byte1 as u16;
 
+        //NOTE: Currently PC are set by "read memory", per each byte we increment PC but we have this info inside InstructionData too
+        
+
+
         // EXAMPLE TO SET FLAGS: self.registers.set_flag_bit(crate::registers::FLAG_C, false); //Z N H C
-        // ALL FLAGS ARE INSIDE REGISTER F u16 containing bits
-        //println!("{:0>2X}", byte1);
-        //println!("{:0>2X}", byte2);
-        //println!("{:0>4X}", byteJoin);
-        self.registers.set(&instruction.operands[0], byteJoin);
+
+        self.registers.set(&instruction.operands[0], byteJoin); //We need to set cycles? TODO
         0
         
     }
