@@ -4,6 +4,12 @@ pub struct Registers {
     pub sp: u16,
     pub pc: u16,
 }
+//Also defined in instructions file
+pub const FLAG_Z:u8 = 7;
+pub const FLAG_N:u8 = 6;
+pub const FLAG_H:u8 = 5;
+pub const FLAG_C:u8 = 4;
+
 
 impl Registers {
 
@@ -17,9 +23,10 @@ impl Registers {
             pc: 0x0000,
         }
     }
-
+    
+    //FLAGS ARE SAVED IN POSITION 0
     pub fn set_flag_bit(&mut self, n_bit: u8, val: bool) {
-        let mut register_f = self.get("F");
+        let mut register_f = self.get("0");
         // (tu_u8 & (0x1 << n)) == (0x1 << n)
         let bit = (0x1 << n_bit) as u8;
 
@@ -28,10 +35,32 @@ impl Registers {
             false => register_f &= !bit
         }
 
-        self.set("F", register_f as u16);
+        self.set("0", register_f as u16);
     }
 
-    
+    pub fn get_flag_bit(&self, n_bit: u8) -> u8 {
+        let mut register_f = self.get("0");
+        // (tu_u8 & (0x1 << n)) == (0x1 << n)
+        let bit = (0x1 << n_bit) as u8;
+        //Select the bit
+        let result = (register_f & bit);
+        /*
+            example:            1111
+            bit to analyze:     0100    & operation:
+            Res:                0100
+
+            If result is not 0 the flag is active
+        */
+
+        if(result != 0) {
+            0x1
+        } else {
+            0x0
+        }
+        
+    }
+
+    //Works also for flags
     pub fn set(&mut self, reg: &str, val: u16) {
         
         match reg.len() {
@@ -72,26 +101,26 @@ impl Registers {
     }
 
     pub fn print(&self) {
+        
         println!("
 ╔═══════╦══════════╗ ╔══════════╦══════════════════╗
 ║ A: {:0>2X} ║ {:0>8b} ║ ║ PC: {:0>4X} ║ {:0>16b} ║
 ║ B: {:0>2X} ║ {:0>8b} ║ ║ SP: {:0>4X} ║ {:0>16b} ║
 ║ C: {:0>2X} ║ {:0>8b} ║ ╚══════════╩══════════════════╝
-║ D: {:0>2X} ║ {:0>8b} ║
-║ E: {:0>2X} ║ {:0>8b} ║
-║ F: {:0>2X} ║ {:0>8b} ║
-║ H: {:0>2X} ║ {:0>8b} ║
-║ L: {:0>2X} ║ {:0>8b} ║
-╚═══════╩══════════╝", 
+║ D: {:0>2X} ║ {:0>8b} ║ ╔══════╗
+║ E: {:0>2X} ║ {:0>8b} ║ ║ Z: {:?} ║
+║ F: {:0>2X} ║ {:0>8b} ║ ║ N: {:?} ║
+║ H: {:0>2X} ║ {:0>8b} ║ ║ H: {:?} ║
+║ L: {:0>2X} ║ {:0>8b} ║ ║ C: {:?} ║
+╚═══════╩══════════╝ ╚══════╝", 
         self.register['A' as usize], self.register['A' as usize], self.pc, self.pc,
         self.register['B' as usize], self.register['B' as usize], self.sp, self.sp,
         self.register['C' as usize], self.register['C' as usize],
-        self.register['D' as usize], self.register['D' as usize],
-        self.register['E' as usize], self.register['E' as usize],
-        self.register['F' as usize], self.register['F' as usize],
-        self.register['H' as usize], self.register['H' as usize],
-        self.register['L' as usize], self.register['L' as usize]);
-        
+        self.register['D' as usize], self.register['D' as usize], 
+        self.register['E' as usize], self.register['E' as usize], self.get_flag_bit(FLAG_Z),
+        self.register['F' as usize], self.register['F' as usize], self.get_flag_bit(FLAG_N),
+        self.register['H' as usize], self.register['H' as usize], self.get_flag_bit(FLAG_H),
+        self.register['L' as usize], self.register['L' as usize], self.get_flag_bit(FLAG_C));
     }
 
 }

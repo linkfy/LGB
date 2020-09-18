@@ -110,8 +110,19 @@ impl Cpu {
         
     }
 
-    fn LD(&self, instruction: InstructionData, mem: &mut Memory) -> i32{
+    fn LD(&mut self, instruction: InstructionData, mem: &mut Memory) -> i32{
+        //Case 0x31 LD "SP", "d16"
+        let byte1: u8 = mem.read_byte(self);
+        let byte2: u8 = mem.read_byte(self);
+        //Little endian: last byte goes first in memory
+        let byteJoin: u16 = (byte2 as u16) << 8 | byte1 as u16;
 
+        // EXAMPLE TO SET FLAGS: self.registers.set_flag_bit(crate::registers::FLAG_C, false); //Z N H C
+        // ALL FLAGS ARE INSIDE REGISTER F u16 containing bits
+        //println!("{:0>2X}", byte1);
+        //println!("{:0>2X}", byte2);
+        //println!("{:0>4X}", byteJoin);
+        self.registers.set(&instruction.operands[0], byteJoin);
         0
         
     }
