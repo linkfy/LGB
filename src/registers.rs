@@ -101,7 +101,14 @@ impl Registers {
     }
 
     pub fn print(&self) {
-        
+        //The Value of F is the value of ZNHC FLAGS so when we are printing it we need to print the real value:
+        let mut real_register_F: u8 = 0;
+        let real_register_F = real_register_F | (self.get_flag_bit(FLAG_Z)<<7);
+        let real_register_F = real_register_F | (self.get_flag_bit(FLAG_N)<<6);
+        let real_register_F = real_register_F | (self.get_flag_bit(FLAG_H)<<5);
+        let real_register_F = real_register_F | (self.get_flag_bit(FLAG_C)<<4);
+
+
         println!("
 ╔═══════╦══════════╗ ╔══════════╦══════════════════╗
 ║ A: {:0>2X} ║ {:0>8b} ║ ║ PC: {:0>4X} ║ {:0>16b} ║
@@ -118,7 +125,7 @@ impl Registers {
         self.register['C' as usize], self.register['C' as usize],
         self.register['D' as usize], self.register['D' as usize], 
         self.register['E' as usize], self.register['E' as usize], self.get_flag_bit(FLAG_Z),
-        self.register['F' as usize], self.register['F' as usize], self.get_flag_bit(FLAG_N),
+        real_register_F, real_register_F, self.get_flag_bit(FLAG_N),
         self.register['H' as usize], self.register['H' as usize], self.get_flag_bit(FLAG_H),
         self.register['L' as usize], self.register['L' as usize], self.get_flag_bit(FLAG_C));
     }

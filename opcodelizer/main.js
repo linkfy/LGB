@@ -11,11 +11,15 @@ keys.forEach(element => {
         let op1 = s[element]["operand1"];
         let op2 = s[element]["operand2"];
         let mnemonic = s[element]["mnemonic"];
-        if(op1 != undefined && op2 != undefined && op1.length == 2  && op2.length == 5  && mnemonic == "LD") {
+        
+        
+        //COUNT the amount of letters of the OPCODE, for example 'ADD A, u16' has A->1 char, u16->3 chars
+        if(op1 != undefined && op2 != undefined && op1.length == 1  && op2.length == 1  && mnemonic == "XOR") {
             console.log(s[element]);
             console.log("==========================");
         }
-        if(mnemonic == "LD") {
+        if(mnemonic == "XOR") {
+            console.log(`${op1} + ${op2}`);
             counter++;
         }
         

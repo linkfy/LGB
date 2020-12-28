@@ -80,14 +80,15 @@ impl Cpu {
         let instruction = self.parse_instruction(instruction_json);
         let instruction_cycles = i32::clone(&instruction.cycles[0]);
         println!("{:?}", instruction);
-        println!("{:?}",instruction_cycles);
+        
         
 
         //println!("Opcode for Byte: 0x{:0>2X} is {}", byte, instruction_json);
         //TODO
         match &*instruction_json["mnemonic"].to_string() {
             "LD" => self.LD(instruction, mem),//instructions::LD(&instruction_json, rom, self),
-            "XOR" => self.instruction_unimplemented(&instruction_json),//instructions::XOR(&instruction_json, rom, self),
+            "XOR" => self.XOR(instruction, mem),
+            //"XOR" => self.instruction_unimplemented(&instruction_json),//instructions::XOR(&instruction_json, rom, self),
             "PREFIX" => self.execute_prefix_instruction(mem),
             _=> self.instruction_unimplemented(&instruction_json),
         };
@@ -113,7 +114,7 @@ impl Cpu {
     }
 
     fn LD(&mut self, instruction: InstructionData, mem: &mut Memory) -> i32{
-        //Case 0x31 LD "SP", "d16"
+        //Case 0x31 LD "SP", "d16" && 0x21 // FLAGS are not modified
         let byte1: u8 = mem.read_byte(self);
         let byte2: u8 = mem.read_byte(self);
         //Little endian: last byte goes first in memory
@@ -128,6 +129,26 @@ impl Cpu {
         self.registers.set(&instruction.operands[0], byteJoin); //We need to set cycles? TODO
         0
         
+    }
+
+    fn XOR(&mut self, instruction: InstructionData, mem: &mut Memory) ->i32 {
+        //All the XOR operations set A to the value of the register from operand collected
+        //ALL CASES: XOR A, selected_register
+        //0xAF only has 1 byte length, we only need to read one time from memory
+        //let byte1: u8 = mem.read_byte(self); //PC is incremented by read byte but also we have the info inside InstructionData
+        let register_A = self.registers.get("A");
+        let selected_register = self.registers.get(&instruction.operands[0]);
+        //println!("Operand {:}", &instruction.operands[0]);
+        let result_operation = register_A ^ selected_register;
+        if(result_operation == 0) {
+            self.registers.set_flag_bit(crate::registers::FLAG_Z, true);
+        }
+        self.registers.set_flag_bit(crate::registers::FLAG_N, false); //Unset
+        self.registers.set_flag_bit(crate::registers::FLAG_H, false); //Unset
+        self.registers.set_flag_bit(crate::registers::FLAG_C, false); //Unset
+
+        self.registers.set(&instruction.operands[0], result_operation as u16); //XOR reg, reg, set register A to xor itself
+        0
     }
 
 
